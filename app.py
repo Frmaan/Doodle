@@ -1,3 +1,4 @@
+import os
 import gradio as gr
 import numpy as np
 from PIL import Image
@@ -117,4 +118,9 @@ with gr.Blocks(title="Sketch Recognition",
     )
 
 if __name__ == "__main__":
-    app.launch()
+    port = int(os.environ.get("PORT", 7860))
+
+    app.launch(
+        server_name="0.0.0.0",
+        server_port= port
+    )
