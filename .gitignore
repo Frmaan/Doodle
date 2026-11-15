@@ -1,0 +1,23 @@
+#Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+#venv
+.venv/
+venv/
+
+#jupyter
+.ipynb_checkpoints/
+
+#dataset
+data/
+
+#env vars
+
+.env
+.env.*
+
+#ide and os file
+.vscode
+
