@@ -108,7 +108,7 @@ with gr.Blocks(title="Sketch Recognition",
 
     guess_button = gr.Button("Guess", variant="primary",size="lg")
 
-    result = gr.Label(label="Prediction", num_top_classes=5)
+    result = gr.Label(label="Prediction", num_top_classes=3)
 
 
     guess_button.click(
@@ -122,5 +122,6 @@ if __name__ == "__main__":
 
     app.launch(
         server_name="0.0.0.0",
-        server_port= port
+        server_port= port,
+        share = True
     )

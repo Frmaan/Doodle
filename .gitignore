@@ -21,3 +21,5 @@ data/
 #ide and os file
 .vscode
 
+
+.gradio/

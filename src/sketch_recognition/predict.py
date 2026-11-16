@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-CHECKPOINT_PATH = BASE_DIR / "models" / "sketch_cnn.pth"
+CHECKPOINT_PATH = BASE_DIR / "models" / "sketch_cnn_32.pth"
 
 checkpoint = torch.load(
     CHECKPOINT_PATH,
