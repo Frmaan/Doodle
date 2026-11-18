@@ -389,7 +389,7 @@ with gr.Blocks(
             label="Your drawing",
             height="70vh",
             width="100%",
-            canvas_size=(750, 1300),
+            canvas_size=(800, 1300),
             fixed_canvas=True,
             container=False,
             image_mode="L",
@@ -417,7 +417,7 @@ with gr.Blocks(
         )
 
         mobile_close_button = gr.Button(
-            "Try Again",
+            "Close",
             variant="primary",
             size="lg"
         )
