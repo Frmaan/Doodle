@@ -3,7 +3,7 @@ import torch.nn as nn
 
 class SketchCNN(nn.Module):
 
-    def __init__(self, num_classes=50):
+    def __init__(self, num_classes=15):
         super().__init__()
 
         self.features = nn.Sequential(

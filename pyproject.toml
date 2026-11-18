@@ -1,7 +1,7 @@
 [project]
 name = "sketch-recognition"
 version = "0.1.0"
-description = "Add your description here"
+description = "Hand-drawn sketch recognition using a PyTorch CNN and Gradio"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [

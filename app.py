@@ -1,66 +1,22 @@
-
 import os
 import html
 import gradio as gr
 import numpy as np
-from PIL import Image
 from sketch_recognition.predict import predict_sketch
-
-# IMAGE PREPROCESSING
-
-def preprocess_drawing(drawing):
-
-    if drawing is None or drawing["composite"] is None:
-        return None
-
-    # Get grayscale image
-    image = drawing["composite"]
-
-    # Invert
-    image = 255 - image
-
-    # Find pixels of the drawing
-    coords = np.argwhere(image > 0)
-
-    if len(coords) == 0:
-        return None
-
-    y_min, x_min = coords.min(axis=0)
-    y_max, x_max = coords.max(axis=0)
-
-    cropped = image[y_min : y_max + 1, x_min : x_max + 1]
-
-    height, width = cropped.shape
-
-    margin = max(1, int(max(height, width) * 0.1))
-    side = max(height, width) + (2 * margin)
-
-    top = (side - height) // 2
-    bottom = side - height - top
-
-    left = (side - width) // 2
-    right = side - width - left
-
-    canvas = np.pad(
-        cropped,
-        ((top, bottom), (left, right)),
-        mode="constant",
-        constant_values=0
-    )
-
-    resized = Image.fromarray(canvas).resize(
-        (28, 28),
-        Image.Resampling.LANCZOS
-    )
-
-    processed = np.asarray(resized, dtype=np.float32) / 255.0
-
-    return processed
-
+from sketch_recognition.preprocessing import preprocess_drawing
 
 # DRAWING INSPECTION
 
+
 def inspect_drawing(drawing):
+
+    print("Input type:", type(drawing))
+
+    if isinstance(drawing, dict):
+        print("Dictionary keys:", drawing.keys())
+    elif isinstance(drawing, np.ndarray):
+        print("Array shape:", drawing.shape)
+        print("Array dtype:", drawing.dtype)
 
     processed = preprocess_drawing(drawing)
 
@@ -79,6 +35,7 @@ def inspect_drawing(drawing):
 
 # PREDICTION HTML
 
+
 def create_prediction_html(results):
 
     if not results:
@@ -89,11 +46,9 @@ def create_prediction_html(results):
         """
 
     # Get top 3 predictions
-    top_predictions = sorted(
-        results.items(),
-        key=lambda item: item[1],
-        reverse=True
-    )[:3]
+    top_predictions = sorted(results.items(), key=lambda item: item[1], reverse=True)[
+        :3
+    ]
 
     prediction_html = """
         <div class="prediction-heading">
@@ -130,6 +85,7 @@ def create_prediction_html(results):
 
 # SHARED PREDICTION LOGIC
 
+
 def get_prediction(drawing):
 
     processed_image = preprocess_drawing(drawing)
@@ -145,30 +101,25 @@ def get_prediction(drawing):
 
     return create_prediction_html(results)
 
+
 # DESKTOP PREDICTION HANDLER
+
 
 def recognize_desktop(drawing):
 
     prediction_html = get_prediction(drawing)
 
-    return (
-        prediction_html,
-        gr.update(visible=True),
-        gr.update(visible=False)
-    )
+    return (prediction_html, gr.update(visible=True), gr.update(visible=False))
 
 
 # MOBILE PREDICTION HANDLER
+
 
 def recognize_mobile(drawing):
 
     prediction_html = get_prediction(drawing)
 
-    return (
-        prediction_html,
-        gr.update(visible=True),
-        gr.update(visible=False)
-    )
+    return (prediction_html, gr.update(visible=True), gr.update(visible=False))
 
 
 # INTERFACE
@@ -318,30 +269,21 @@ with gr.Blocks(
 
     }
 
-    """
+    """,
 ) as app:
 
     # PROJECT TITLE
 
-    gr.Markdown(
-        "# Doodle",
-        elem_id="title"
-    )
+    gr.Markdown("# Doodle", elem_id="title")
 
-
-   
     # DESKTOP LAYOUT
-    
 
     with gr.Column(elem_id="desktop-view"):
 
         with gr.Row(elem_id="desktop-layout"):
 
             # Drawing area
-            with gr.Column(
-                scale=7,
-                elem_id="desktop-drawing"
-            ):
+            with gr.Column(scale=7, elem_id="desktop-drawing"):
 
                 desktop_sketchpad = gr.Sketchpad(
                     label="Your drawing",
@@ -354,34 +296,18 @@ with gr.Blocks(
                     type="numpy",
                 )
 
-                desktop_guess_button = gr.Button(
-                    "Guess",
-                    variant="primary",
-                    size="lg"
-                )
-
+                desktop_guess_button = gr.Button("Guess", variant="primary", size="lg")
 
             # Right-side prediction panel
             with gr.Column(
-                scale=3,
-                visible=False,
-                elem_id="desktop-prediction-panel"
+                scale=3, visible=False, elem_id="desktop-prediction-panel"
             ) as desktop_prediction_panel:
 
-                desktop_result = gr.HTML(
-                    elem_id="desktop-prediction-result"
-                )
+                desktop_result = gr.HTML(elem_id="desktop-prediction-result")
 
-                desktop_close_button = gr.Button(
-                    "Try Again",
-                    variant="primary",
-                    size="lg"
-                )
+                desktop_close_button = gr.Button("Close", variant="primary", size="lg")
 
-
- 
     # MOBILE LAYOUT
-   
 
     with gr.Column(elem_id="mobile-view"):
 
@@ -396,79 +322,52 @@ with gr.Blocks(
             type="numpy",
         )
 
-        mobile_guess_button = gr.Button(
-            "Guess",
-            variant="primary",
-            size="lg"
-        )
+        mobile_guess_button = gr.Button("Guess", variant="primary", size="lg")
 
-
-  
     # MOBILE PREDICTION NOTIFICATION
-   
 
     with gr.Column(
-        visible=False,
-        elem_id="prediction-overlay"
+        visible=False, elem_id="prediction-overlay"
     ) as mobile_prediction_overlay:
 
-        mobile_result = gr.HTML(
-            elem_id="mobile-prediction-result"
-        )
+        mobile_result = gr.HTML(elem_id="mobile-prediction-result")
 
-        mobile_close_button = gr.Button(
-            "Close",
-            variant="primary",
-            size="lg"
-        )
-
+        mobile_close_button = gr.Button("Close", variant="primary", size="lg")
 
     # desktop events
 
     desktop_guess_button.click(
         fn=recognize_desktop,
         inputs=desktop_sketchpad,
-        outputs=[
-            desktop_result,
-            desktop_prediction_panel,
-            mobile_prediction_overlay
-        ]
+        outputs=[desktop_result, desktop_prediction_panel, mobile_prediction_overlay],
     )
 
     desktop_close_button.click(
         fn=lambda: gr.update(visible=False),
         inputs=None,
-        outputs=desktop_prediction_panel
+        outputs=desktop_prediction_panel,
     )
-
 
     # MOBILE EVENTS
 
     mobile_guess_button.click(
         fn=recognize_mobile,
         inputs=mobile_sketchpad,
-        outputs=[
-            mobile_result,
-            mobile_prediction_overlay,
-            desktop_prediction_panel
-        ]
+        outputs=[mobile_result, mobile_prediction_overlay, desktop_prediction_panel],
     )
 
     mobile_close_button.click(
         fn=lambda: gr.update(visible=False),
         inputs=None,
-        outputs=mobile_prediction_overlay
+        outputs=mobile_prediction_overlay,
     )
 
-#launch
+# launch
 
 if __name__ == "__main__":
 
     port = int(os.environ.get("PORT", 7860))
 
     app.launch(
-        server_name="0.0.0.0",
-        server_port=port,
-        footer_links=[],
-        run_history=False
+        server_name="0.0.0.0", server_port=port, footer_links=[], run_history=False
     )
