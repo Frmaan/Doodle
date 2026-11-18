@@ -387,7 +387,7 @@ with gr.Blocks(
 
         mobile_sketchpad = gr.Sketchpad(
             label="Your drawing",
-            height="80vh",
+            height="70vh",
             width="100%",
             canvas_size=(750, 1100),
             fixed_canvas=True,
