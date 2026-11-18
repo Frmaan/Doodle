@@ -13,15 +13,18 @@ class SketchCNN(nn.Module):
 
             nn.Conv2d(32,64, kernel_size=3),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2)
+            nn.MaxPool2d(kernel_size=2, stride=2),
+
+            nn.Conv2d(64,128,3),
+            nn.ReLU()
         )
 
         self.classifier = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(64 * 5 * 5, 128),
+            nn.Linear(128 * 3 * 3, 256),
             nn.ReLU(),
             nn.Dropout(p=0.3),
-            nn.Linear(128, num_classes)
+            nn.Linear(256, num_classes)
         )
 
     def forward(self, x):
