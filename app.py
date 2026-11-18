@@ -389,7 +389,7 @@ with gr.Blocks(
             label="Your drawing",
             height="70vh",
             width="100%",
-            canvas_size=(750, 1100),
+            canvas_size=(750, 1300),
             fixed_canvas=True,
             container=False,
             image_mode="L",
